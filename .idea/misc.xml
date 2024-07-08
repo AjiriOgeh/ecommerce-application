@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Pipenv (ecommerce_application)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Pipenv (ecommerce_application)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Pipenv (ecommerce-application)" project-jdk-type="Python SDK" />
 </project>

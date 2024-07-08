@@ -1,16 +1,12 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MaxLengthValidator, MinLengthValidator
 from django.db import models
+
+from ecommerce_application import settings
+from user.models import Customer, ShoppingCart
 
 
 # Create your models here.
-
-class Customer(models.Model):
-    customer_id = models.AutoField(primary_key=True)
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    phone_number = models.CharField(max_length=12)
-    password = models.CharField(max_length=100)
-    email_address = models.EmailField(max_length=200, unique=True)
 
 
 class Address(models.Model):
@@ -19,7 +15,7 @@ class Address(models.Model):
     street = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
 
 
 class Product(models.Model):
@@ -47,15 +43,19 @@ class Product(models.Model):
 
 
 class Item(models.Model):
+    shopping_cart = models.ForeignKey(ShoppingCart, on_delete=models.CASCADE, related_name='items')
     quantity = models.PositiveIntegerField()
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-
-
-class ShoppingCart(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    price = models.DecimalField(max_digits=25, decimal_places=2,default=0.00)
 
 
 class BillingInformation(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    receiver_number = models.CharField(max_length=11,validators=[MaxLengthValidator(11), MinLengthValidator(11)],default="")
+    receiver_address = models.TextField(blank=False,default="")
+    receiver_name = models.CharField( max_length=225,default="")
+
+
+class Order(models.Model):
+    cart = models.ForeignKey(ShoppingCart, on_delete=models.PROTECT)
+    total_price = models.DecimalField(max_digits=25, decimal_places=2)
+    billing_format = models.ForeignKey(BillingInformation, on_delete=models.PROTECT)
